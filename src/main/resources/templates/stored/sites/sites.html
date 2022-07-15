@@ -1,0 +1,130 @@
+<!DOCTYPE HTML>
+<html lang="en" xml:lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Gallery Checker: Sites</title>
+    <link th:href="@{/css/bootstrap.min.css}" href="../../../static/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link th:href="@{/css/bootstrap-icons.css}" href="../../../static/css/bootstrap-icons.css" rel="stylesheet" crossorigin="anonymous">
+    <link th:href="@{/css/dataTables.bootstrap5.min.css}" href="../../../static/css/dataTables.bootstrap5.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link th:href="@{/css/toastr.min.css}" href="../../../static/css/toastr.min.css" rel="stylesheet" crossorigin="anonymous">
+</head>
+<body>
+<header>
+    <nav th:replace="template :: navbar"/>
+    <vav th:replace="stored/template :: stored"/>
+</header>
+<main>
+    <div class="container" style="max-width: 900px">
+        <div class="table-responsive-sm">
+            <table id="sitesTable" class="table display compact" style="width: 100%; font-size: small">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Host</th>
+                    <th scope="col">Tubes</th>
+                    <th scope="col">Total Galls</th>
+                    <th scope="col">Unchecked</th>
+                    <th scope="col">Unavailable</th>
+                    <th scope="col" class="d-none"></th>
+                    <th scope="col" class="d-none"></th>
+                    <th scope="col" class="d-none"></th>
+                </tr>
+                </thead>
+                <tbody th:unless="${#lists.isEmpty(allSites)}">
+                <tr th:each="site : ${allSites}">
+                    <td th:text="${site.host}">xxxxxxxx</td>
+                    <td class="col-md-2" ><a class="btn btn-link btn-sm" th:onclick="'javascript:openSiteTubesModal(\''+ ${site.id} + '\');'" th:text="${site.tubesNumber}">5</a></td>
+                    <td class="col-md-2" th:text="${site.galleriesNumber}">150</td>
+                    <td class="col-md-2" th:text="${site.uncheckedGalleriesNumber}">100</td>
+                    <td class="col-md-2" th:text="${site.unavailableCheckedGalleriesNumber}">50</td>
+                    <td class="col-md-1">
+                        <span class="p-1"><a class="btn btn-outline-primary btn-sm" th:onclick="'javascript:openUploadGalleriesModal(\''+ ${site.id} + '\');'">Upload</a></span>
+                    </td>
+                    <td class="col-md-1">
+                        <span class="p-1"><a class="btn btn-outline-primary btn-sm" th:onclick="'javascript:openCheckGalleriesModal(\''+ ${site.id} + '\');'">Check</a></span>
+                    </td>
+                    <td class="col-md-1">
+                        <span class="p-1"><a class="btn btn-outline-primary btn-sm" th:onclick="'javascript:openExportGalleriesModal(\''+ ${site.id} + '\');'">Export</a></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div th:fragment="site-tubes" id="siteTubesModalHolder"></div>
+    <div th:fragment="upload-galleries" id="uploadGalleriesModalHolder"></div>
+    <div th:fragment="check-galleries" id="checkGalleriesModalHolder"></div>
+    <div th:fragment="export-galleries" id="exportGalleriesModalHolder"></div>
+</main>
+<footer th:replace="template :: footer"></footer>
+<script th:src="@{/js/bootstrap.min.js}" src="../../../static/js/bootstrap.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script th:src="@{/js/jquery.min.js}" src="../../../static/js/jquery.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script th:src="@{/js/jquery.dataTables.min.js}" src="../../../static/js/jquery.dataTables.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script th:src="@{/js/dataTables.bootstrap5.min.js}" src="../../../static/js/dataTables.bootstrap5.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script th:src="@{/js/toastr.min.js}" src="../../../static/js/toastr.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script th:src="@{/js/toastr-options.js}" src="../../../static/js/toastr-options.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript">
+    $(document).ready(function () {$('#sitesTable').DataTable({autoWidth: false, searching: false, paging: false, info: false});});
+
+    function openSiteTubesModal(id) {
+        $.ajax({
+            url: "/stored/sites/tubes?siteId=" + id,
+            success: function(data){
+                $("#siteTubesModalHolder").html(data);
+                var config = {
+                    backdrop: 'static',
+                    keyboard: true
+                };
+                var siteTubesModal = new bootstrap.Modal(document.getElementById('siteTubesModal'), config);
+                siteTubesModal.toggle();
+            }
+        });
+    }
+
+    function openUploadGalleriesModal(id) {
+        $.ajax({
+            url: "/stored/sites/upload?siteId=" + id,
+            success: function(data){
+                $("#uploadGalleriesModalHolder").html(data);
+                var config = {
+                    backdrop: 'static',
+                    keyboard: true
+                };
+                var uploadGalleriesModal = new bootstrap.Modal(document.getElementById('uploadGalleriesModal'), config);
+                uploadGalleriesModal.toggle();
+            }
+        });
+    }
+
+    function openCheckGalleriesModal(id) {
+        $.ajax({
+            url: "/stored/sites/check?siteId=" + id,
+            success: function(data){
+                $("#checkGalleriesModalHolder").html(data);
+                var config = {
+                    backdrop: 'static',
+                    keyboard: true
+                };
+                var checkGalleriesModal = new bootstrap.Modal(document.getElementById('checkGalleriesModal'), config);
+                checkGalleriesModal.toggle();
+            }
+        });
+    }
+
+    function openExportGalleriesModal(id) {
+        $.ajax({
+            url: "/stored/sites/export?siteId=" + id,
+            success: function(data){
+                $("#exportGalleriesModalHolder").html(data);
+                var config = {
+                    backdrop: 'static',
+                    keyboard: true
+                };
+                var exportGalleriesModal = new bootstrap.Modal(document.getElementById('exportGalleriesModal'), config);
+                exportGalleriesModal.toggle();
+            }
+        });
+    }
+</script>
+</body>
+</html>

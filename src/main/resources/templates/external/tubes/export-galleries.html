@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<html lang="en" xml:lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="../../../static/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <script src="../../../static/js/bootstrap.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../../../static/js/jquery.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+<header>
+</header>
+<main>
+<div th:fragment="export-galleries" id="exportGalleriesModal" class="modal fade" role="dialog" aria-labelledby="exportGalleriesLabel" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportGalleriesLabel">Generate export link to list of <strong th:text="${host}"></strong> galleries</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3 row">
+                    <label for="status" class="col-sm-2 col-form-label">Status</label>
+                    <div class="col-sm-10" id="status">
+                        <div class="form-check">
+                            <label class="form-check-label" for="statusActive">active</label>
+                            <input id="statusActive" class="form-check-input" type="radio" name="status" value="active" checked>
+                        </div>
+                        <div class="form-check">
+                            <label class="form-check-label" for="statusDeleted">deleted</label>
+                            <input id="statusDeleted" class="form-check-input" type="radio" name="status" value="deleted" >
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="period" class="col-sm-2 col-form-label">Period</label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <input class="form-control" type="number" id="period" placeholder="days" value="24" min="1">
+                            <span class="input-group-text"><i class="bi bi-calendar-week"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="limit" class="col-sm-2 col-form-label">Limit</label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <input class="form-control" type="number" id="limit" placeholder="limit" value="200" min="1">
+                            <span class="input-group-text"><i class="bi bi-list"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 row pt-3">
+                    <div class="col-sm-12">
+                        <div class="input-group">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="generateExportExternalGalleriesLink()">generate</button>
+                            <input class="form-control form-control-sm" type="text" id="link" placeholder="link">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="copyLink()">copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        function generateExportExternalGalleriesLink() {
+            const status = $("input[type='radio'][name='status']:checked").val();
+            const url = new URL('/external/galleries/export/'.concat(status), window.location.origin);
+            const host = "[[${host}]]";
+            const period = $("input[type='number'][id='period']").val();
+            const limit = $("input[type='number'][id='limit']").val();
+            url.searchParams.append('host', host);
+            url.searchParams.append('period', period);
+            url.searchParams.append('limit', limit);
+            document.getElementById("link").value = url;
+        }
+
+        function copyLink() {
+          const copyText = document.getElementById("link");
+          copyText.select();
+          copyText.setSelectionRange(0, 99999);
+          navigator.clipboard.writeText(copyText.value);
+        }
+</script>
+</div>
+</main>
+<script type="text/javascript">$(window).on('load',function(){$('#exportGalleriesModal').modal('show');});</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+alter table public.qrtz_paused_trigger_grps set schema quartz;
+alter table public.qrtz_job_details set schema quartz;
+alter table public.qrtz_triggers set schema quartz;
+alter table public.qrtz_simple_triggers set schema quartz;
+alter table public.qrtz_cron_triggers set schema quartz;
+alter table public.qrtz_simprop_triggers set schema quartz;
+alter table public.qrtz_fired_triggers set schema quartz;
+alter table public.qrtz_blob_triggers set schema quartz;
+alter table public.qrtz_calendars set schema quartz;
+alter table public.qrtz_scheduler_state set schema quartz;
+alter table public.qrtz_locks set schema quartz;

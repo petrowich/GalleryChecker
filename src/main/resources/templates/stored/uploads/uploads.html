@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<html lang="en" xml:lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Gallery Checker: Uploads</title>
+    <link th:href="@{/css/bootstrap.min.css}" href="../../../static/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link th:href="@{/css/bootstrap-icons.css}" href="../../../static/css/bootstrap-icons.css" rel="stylesheet" crossorigin="anonymous">
+    <link th:href="@{/css/dataTables.bootstrap5.min.css}" href="../../../static/css/dataTables.bootstrap5.min.css" rel="stylesheet" crossorigin="anonymous">
+    <style type="text/css">.pagination{display: inline-flex;} div.dataTables_wrapper div.dataTables_paginate{text-align: center;}</style>
+</head>
+<body>
+<header>
+    <nav th:replace="template :: navbar"/>
+    <vav th:replace="stored/template :: stored"/>
+</header>
+<main>
+    <div class="container">
+        <div class="table-responsive-sm">
+            <table id="uploadsTable" class="table display compact" style="width: 100%; font-size: small">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Uploaded by</th>
+                    <th scope="col">Site</th>
+                    <th scope="col">Date/Time</th>
+                    <th scope="col">FileName</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Uploaded tot</th>
+                    <th scope="col">Uploaded new</th>
+                    <th scope="col">Error</th>
+                </tr>
+                </thead>
+                <tbody th:unless="${#lists.isEmpty(allUploads)}">
+                <tr th:each="upload : ${allUploads}">
+                    <td class="col-md-1" th:text="${upload.username}">username</td>
+                    <td class="col-md-1" th:text="${upload.siteHost}">xxx.com</td>
+                    <td class="col-md-2" th:text="${upload.uploadDateTime}">2015-01-01 15:33</td>
+                    <td class="col-md-1" th:text="${upload.fileName}">xxx.txt</td>
+                    <td class="col-md-1" th:text="${upload.status}">OK</td>
+                    <td class="col-md-1" th:text="${upload.uploadedGalleriesNumber}">50</td>
+                    <td class="col-md-1" th:text="${upload.newUploadedGalleriesNumber}">50</td>
+                    <td class="col-md-1">
+                        <div style="font-size: xx-small; word-wrap: break-word;" th:text="${upload.errorMessage}">error</div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div th:fragment="upload-tubes" id="uploadTubesModalHolder"></div>
+    <div th:fragment="upload" id="uploadModalHolder"></div>
+</main>
+<footer th:replace="template :: footer"></footer>
+<script th:src="@{/js/jquery.min.js}" src="../../../static/js/jquery.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script th:src="@{/js/bootstrap.min.js}" src="../../../static/js/bootstrap.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script th:src="@{/js/jquery.dataTables.min.js}" src="../../../static/js/jquery.dataTables.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script th:src="@{/js/dataTables.bootstrap5.min.js}" src="../../../static/js/dataTables.bootstrap5.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript" th:inline="none">
+    $(document).ready(function () {
+            $('#uploadsTable').DataTable(
+                {autoWidth: false,
+                 searching: false,
+                 paging: true,
+                 order: [[ 2, 'desc' ]],
+                 bLengthChange: false,
+                 info: false,
+                 "sDom": '<"row view-filter"<"col-sm-12"<"pull-left"l><"pull-right"f><"clearfix">>>t<"row view-pager"<"col-sm-12"<"text-center"ip>>>'
+                });
+            });
+</script>
+</body>
+</html>

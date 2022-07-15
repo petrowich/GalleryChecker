@@ -1,0 +1,11 @@
+<ul th:fragment="external" class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link" th:classappend="${#httpServletRequest.getServletPath().startsWith('/external/tubes') ? 'active':''}" th:href="@{/external/tubes/}" href="#">Tubes</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" th:classappend="${#httpServletRequest.getServletPath().startsWith('/external/tasks') ? 'active':''}" th:href="@{/external/tasks/}" href="#">Tasks</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" th:classappend="${#httpServletRequest.getServletPath().startsWith('/external/fetches') ? 'active':''}" th:href="@{/external/fetches/}" href="#">Fetches</a>
+    </li>
+</ul>

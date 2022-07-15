@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html lang="en" xml:lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="../../../static/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <script src="../../../static/js/bootstrap.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="../../../static/css/dataTables.bootstrap5.min.css" rel="stylesheet" crossorigin="anonymous">
+    <script src="../../../static/js/jquery.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../../../static/js/jquery.dataTables.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../../../static/js/dataTables.bootstrap5.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="text/javascript">$(window).on('load',function(){$('#fetchInvocationsModal').modal('show');});</script>
+</head>
+<body>
+<header>
+</header>
+<main>
+<div th:fragment="fetch-invocations" id="fetchInvocationsModal" class="modal fade" role="dialog" aria-labelledby="fetchInvocationsLabel" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fetchInvocationsLabel">Fetch invocations:</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table id="fetchInvocationsTable" class="table table-responsive-sm">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Url</th>
+                        <th scope="col">Fetched</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Error</th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-borderless">
+                    <tr th:each="invocation : ${fetchInvocations}">
+                        <th scope="row" th:text="${invocation.invocationNumber}">1</th>
+                        <td><small th:text="${invocation.fetchUrl}">http://widgets.redtube.com/_affiliate/saved/download/export_offline.csv</small></td>
+                        <td th:text="${invocation.fetchedGalleries}">88</td>
+                        <td th:text="${invocation.status}">OK</td>
+                        <td><p><small th:text="${invocation.errorMessage}">none</small></p></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {$('#fetchInvocationsTable').DataTable({autoWidth: false, searching: false, paging: false, info: false});});
+    </script>
+</div>
+</main>
+</body>
+</html>

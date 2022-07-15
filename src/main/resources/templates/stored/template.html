@@ -1,0 +1,14 @@
+<ul th:fragment="stored" class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link" th:classappend="${#httpServletRequest.getServletPath().startsWith('/stored/sites') ? 'active':''}" th:href="@{/stored/sites/}" href="#">Sites</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" th:classappend="${#httpServletRequest.getServletPath().startsWith('/stored/uploads') ? 'active':''}" th:href="@{/stored/uploads/}" href="#">Uploads</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" th:classappend="${#httpServletRequest.getServletPath().startsWith('/stored/tasks') ? 'active':''}" th:href="@{/stored/tasks/}" href="#">Tasks</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" th:classappend="${#httpServletRequest.getServletPath().startsWith('/stored/checks') ? 'active':''}" th:href="@{/stored/checks/}" href="#">Checks</a>
+    </li>
+</ul>

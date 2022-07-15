@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html lang="en" xml:lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Gallery Checker</title>
+    <link th:href="@{/css/bootstrap.min.css}" href="../static/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <script th:src="@{/js/bootstrap.min.js}" src="../static/js/bootstrap.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+<header>
+    <nav th:fragment="navbar" sec:authorize="isAuthenticated()" class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${#httpServletRequest.getServletPath().startsWith('/external') ? 'active':''}" th:href="@{/external}" href="#" aria-current="page">External Galleries</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${#httpServletRequest.getServletPath().startsWith('/stored') ? 'active':''}" th:href="@{/stored}" href="#" aria-current="page">Stored Galleries</a>
+                    </li>
+                    <li sec:authorize="hasAnyRole('ADMIN','POWER_USER')" class="nav-item">
+                        <a class="nav-link" th:classappend="${#httpServletRequest.getServletPath().startsWith('/users') ? 'active':''}" th:href="@{/users}" href="#" aria-current="page">Users</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav pull-left pe-5">
+                    <li class="nav-item dropdown">
+                        <a sec:authentication="name" class="nav-link dropdown-toggle active" href="#" id="navbarDropdownAccount" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Account
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownAccount">
+                            <li><a class="dropdown-item" th:href="@{/auth/account}" href="#">account</a></li>
+                            <li>
+                            <li><a class="dropdown-item" th:href="'javascript:document.logoutForm.submit()'" href="#">logout</a></li>
+                                <form name="logoutForm" th:action="@{/auth/logout}" method="post" th:hidden="true">
+                                    <input hidden type="submit" value="Sign Out" />
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                    <li th:if="${false}">
+                        <form class="form-inline my-2 my-lg-0">
+                            <button class="btn btn-outline-light" type="submit">Login</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<main>
+</main>
+<footer th:fragment="footer" />
+</footer>
+</body>
+</html>

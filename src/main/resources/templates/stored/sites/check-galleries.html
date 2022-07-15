@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<html lang="en" xml:lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="../../../static/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <script src="../../../static/js/bootstrap.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../../../static/js/flatpickr.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../../../static/js/jquery.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+<header>
+</header>
+<main>
+<div th:fragment="check-galleries" id="checkGalleriesModal" class="modal fade" role="dialog" aria-labelledby="checkGalleriesLabel" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="checkGalleriesModalLabel">Check stored galleries <strong th:text="${site.host}"></strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addTask" action="#" th:action="@{./import}" th:object="${task}" method="post">
+                <input id="siteId" type="hidden" th:field="${task.siteId}"/>
+                <input id="host" type="hidden" th:field="${task.host}"/>
+                <input id="once" type="hidden" th:field="${task.once}"/>
+                <div class="modal-body">
+                    <div class="mb-3 row">
+                        <div class="col-sm-10" id="aim">
+                            <div class="form-check">
+                                <label class="form-check-label" for="aimAvailable" th:text="'available (' + ${site.availableCheckedGalleriesNumber} + ')'">available</label>
+                                <input class="form-check-input" type="radio" name="aimRadios" id="aimAvailable"
+                                       value="AVAILABLE" th:field="${task.aim}" checked>
+                            </div>
+                            <div class="form-check">
+                                <label class="form-check-label" for="aimUnchecked" th:text="'unchecked (' + ${site.uncheckedGalleriesNumber} + ')'">unchecked</label>
+                                <input class="form-check-input" type="radio" name="aimRadios" id="aimUnchecked"
+                                       value="UNCHECKED" th:field="${task.aim}">
+                            </div>
+                            <div class="form-check">
+                                <label class="form-check-label" for="aimAll" th:text="'all (' + ${site.galleriesNumber} + ')'">all</label>
+                                <input class="form-check-input" type="radio" name="aimRadios" id="aimAll"
+                                       value="ALL" th:field="${task.aim}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Check</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript">
+        document.getElementById("aimUnchecked").setAttribute("checked","checked")
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+			$("#addTask").submit(function(event) {
+				event.preventDefault();
+				ajaxAddTask();
+			});
+			function ajaxAddTask() {
+				var addTaskData = {
+				    siteId : [[${task.siteId}]],
+				    host : "[[${task.host}]]",
+				    once : [[${task.once}]],
+				    aim : $("input[type='radio'][name='aim']:checked").val()
+				}
+                $.ajax({
+                    type : "POST",
+                    url: "/api/stored/tasks/add",
+                    contentType : "application/json",
+                    dataType : 'json',
+                    data : JSON.stringify(addTaskData),
+                    success : function(data) {
+                        toastr[data.toastType](data.message, data.title)
+                    },
+                    error : function(jqXHR) {
+                        toastr[jqXHR.responseJSON.toastType](jqXHR.responseJSON.message, jqXHR.responseJSON.title)
+                    }
+                });
+			}
+		})
+    </script>
+</div>
+</main>
+<script type="text/javascript">
+    $(window).on('load',function(){$('#checkGalleriesModal').modal('show');});
+</script>
+</body>
+</html>

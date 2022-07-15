@@ -1,0 +1,88 @@
+<!DOCTYPE HTML>
+<html lang="en" xml:lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Gallery Checker: Tubes</title>
+    <link th:href="@{/css/bootstrap.min.css}" href="../../../static/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link th:href="@{/css/bootstrap-icons.css}" href="../../../static/css/bootstrap-icons.css" rel="stylesheet" crossorigin="anonymous">
+    <link th:href="@{/css/dataTables.bootstrap5.min.css}" href="../../../static/css/dataTables.bootstrap5.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link th:href="@{/css/toastr.min.css}" href="../../../static/css/toastr.min.css" rel="stylesheet" crossorigin="anonymous">
+</head>
+<body>
+<header>
+    <nav th:replace="template :: navbar"/>
+    <vav th:replace="external/template :: external"/>
+</header>
+<main>
+    <div class="container" style="max-width: 900px;">
+        <div class="table-responsive-sm">
+            <table id="tubesTable" class="table display compact" style="width: 100%; font-size: small">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Host</th>
+                    <th scope="col">Active</th>
+                    <th scope="col">Deleted</th>
+                    <th scope="col" class="d-none"/>
+                </tr>
+                </thead>
+                <tbody th:unless="${#lists.isEmpty(allTubes)}">
+                <tr th:each="tube : ${allTubes}">
+                    <td class="col-md-2" th:text="${tube.host}">xHamster</td>
+                    <td class="col-md-1" th:text="${tube.activeTubeGalleriesNumber}">150</td>
+                    <td class="col-md-1" th:text="${tube.inactiveTubeGalleriesNumber}">100</td>
+                    <td class="col-md-1" th:if="${tube.fetchJobExists}">
+                        <span class="p-1"><a class="btn btn-outline-primary btn-sm" th:onclick="'javascript:openImportModal(\''+ ${tube.id} + '\');'">Import</a></span>
+                        <span class="p-1"><a class="btn btn-outline-primary btn-sm" th:onclick="'javascript:openExportModal(\''+ ${tube.id} + '\');'">Export</a></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div th:text="${success}"></div>
+    <div th:fragment="import-galleries" id="openImportModalHolder"></div>
+    <div th:fragment="export-galleries" id="openExportModalHolder"></div>
+</main>
+<footer th:replace="template :: footer"></footer>
+<script th:src="@{/js/jquery.min.js}" src="../../../static/js/jquery.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script th:src="@{/js/bootstrap.min.js}" src="../../../static/js/bootstrap.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script th:src="@{/js/jquery.dataTables.min.js}" src="../../../static/js/jquery.dataTables.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script th:src="@{/js/dataTables.bootstrap5.min.js}" src="../../../static/js/dataTables.bootstrap5.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script th:src="@{/js/toastr.min.js}" src="../../../static/js/toastr.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script th:src="@{/js/toastr-options.js}" src="../../../static/js/toastr-options.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript">
+    $(document).ready(function () {$('#tubesTable').DataTable({autoWidth: false, searching: false, paging: false, info: false});});
+
+    function openImportModal(id) {
+        $.ajax({
+            url: "/external/tubes/import?tubeId=" + id,
+            success: function(data){
+                $("#openImportModalHolder").html(data);
+                var config = {
+                    backdrop: 'static',
+                    keyboard: true
+                };
+                var importGalleriesModal = new bootstrap.Modal(document.getElementById('importGalleriesModal'), config);
+                importGalleriesModal.toggle();
+            }
+        });
+    }
+
+    function openExportModal(id) {
+        $.ajax({
+            url: "/external/tubes/export?tubeId=" + id,
+            success: function(data){
+                $("#openExportModalHolder").html(data);
+                var config = {
+                    backdrop: 'static',
+                    keyboard: true
+                };
+                var exportGalleriesModal = new bootstrap.Modal(document.getElementById('exportGalleriesModal'), config);
+                exportGalleriesModal.toggle();
+            }
+        });
+    }
+</script>
+</body>
+</html>

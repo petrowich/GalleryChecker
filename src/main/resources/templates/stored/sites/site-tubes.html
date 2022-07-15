@@ -1,0 +1,73 @@
+<!DOCTYPE HTML>
+<html lang="en" xml:lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="../../../static/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link href="../../../static/css/dataTables.bootstrap5.min.css" rel="stylesheet" crossorigin="anonymous">
+    <script src="../../../static/js/bootstrap.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../../../static/js/jquery.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../../../static/js/jquery.dataTables.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../../../static/js/dataTables.bootstrap5.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="text/javascript">$(window).on('load',function(){$('#siteTubesModal').modal('show');});</script>
+</head>
+<body>
+<header>
+</header>
+<main>
+<div th:fragment="site-tubes" id="siteTubesModal" class="modal fade" role="dialog" aria-labelledby="siteTubesLabel" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="siteTubesLabel">Tubes of <strong th:text="${site.host}"></strong> stored galleries</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table id="siteTubesTable" class="table table-sm">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Host</th>
+                        <th scope="col">Total Galls</th>
+                        <th scope="col">Unchecked</th>
+                        <th scope="col">Unavailable</th>
+                        <th scope="col" class="d-none"></th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-borderless">
+                    <tr th:each="tube : ${siteTubes}" th:id="${'tube-' + tube.id}" >
+                        <td scope="row" class="col-md-1 host" th:text="${tube.host}">xxx.xx</td>
+                        <td class="col-md-2 storedGalleriesNumber" th:text="${tube.storedGalleriesNumber}">150</td>
+                        <td class="col-md-2 uncheckedStoredGalleriesNumber" th:text="${tube.uncheckedStoredGalleriesNumber}">100</td>
+                        <td class="col-md-2 unavailableStoredGalleriesNumber" th:text="${tube.unavailableStoredGalleriesNumber}">50</td>
+                        <td class="col-md-1">
+                            <span class="p-1"><a class="btn btn-outline-danger btn-sm" th:onclick="'javascript:resetStatistics(\''+ ${site.id} + '\', \''+ ${tube.id} + '\');'">Reset</a></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {$('#siteTubesTable').DataTable({autoWidth: false, searching: false, paging: false, info: false});});
+    </script>
+    <script type="text/javascript">
+        function resetStatistics(siteId, tubeId) {
+            $.ajax({
+                type : "POST",
+                url: "/api/stored/galleries/reset?siteId=" + siteId + "&tubeId=" + tubeId,
+                success: function(data) {
+                    document.getElementById("tube-" + data.tubeId).getElementsByClassName("storedGalleriesNumber")[0].innerText = data.storedGalleriesNumber;
+                    document.getElementById("tube-" + data.tubeId).getElementsByClassName("uncheckedStoredGalleriesNumber")[0].innerText = data.uncheckedStoredGalleriesNumber;
+                    document.getElementById("tube-" + data.tubeId).getElementsByClassName("unavailableStoredGalleriesNumber")[0].innerText = data.unavailableStoredGalleriesNumber;
+                }
+            });
+        }
+        </script>
+</div>
+</main>
+</body>
+</html>

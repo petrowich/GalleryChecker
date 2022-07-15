@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html lang="en" xml:lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="../../static/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link th:href="@{/css/bootstrap-icons.css}" href="../../static/css/bootstrap-icons.css" rel="stylesheet" crossorigin="anonymous">
+    <link th:href="@{/css/custom.css}" href="../../static/css/custom.css" rel="stylesheet" crossorigin="anonymous">
+    <script src="../../static/js/bootstrap.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../../static/js/flatpickr.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../../static/js/jquery.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+<header>
+</header>
+<main>
+<div th:fragment="edit-user" id="editUserModal" class="modal fade" role="dialog" aria-labelledby="editUserLabel" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserLabel">Edit user</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="#" th:action="@{/users/update}" th:object="${user}" method="post">
+                <input type="hidden" id="id" name="id" th:value="${user.id}">
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-primary"><i class="bi bi-person-fill text-white"></i></span>
+                        <input type="text" class="form-control" id="username" name="username" th:value="${user.username}" readonly>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-primary"><i class="bi bi-at text-white"></i></span>
+                        <input type="email" class="form-control" id="email" name="email" th:value="${user.email}">
+                    </div>
+                    <div class="input-group mb-3">
+                        <label for="role" class="col-sm-2 col-form-label"><span class="ps-2">Role</span></label>
+                        <div class="col-sm-10">
+                            <select th:field="*{role}" class="form-select" id="role" aria-label=".form-select-sm">
+                                <option th:value="${role}" th:each="role : ${allRoles}" th:text="${role.getName()}">USER</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <label for="role" class="col-sm-2 col-form-label"><span class="ps-2">Status</span></label>
+                        <div class="col-sm-10">
+                            <select th:field="*{status}" class="form-select" id="status" aria-label=".form-select-sm">
+                                <option th:value="${status}" th:each="status : ${allStatuses}" th:text="${status.getName()}">ACTIVE</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <a type="button" class="btn btn-labeled btn-light" th:href="'javascript:openResetPasswordModal(\''+${user.id}+'\');'" href="#">
+                            <span class="btn-label"><i class="bi bi-key"></i></span>reset password
+                        </a>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</main>
+<script type="text/javascript">$(window).on('load',function(){$('#editUserModal').modal('show');});</script>
+</body>
+</html>

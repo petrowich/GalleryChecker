@@ -1,0 +1,104 @@
+<!DOCTYPE HTML>
+<html lang="en" xml:lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Gallery Checker: Fetches</title>
+    <link th:href="@{/css/bootstrap.min.css}" href="../../../static/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link th:href="@{/css/dataTables.bootstrap5.min.css}" href="../../../static/css/dataTables.bootstrap5.min.css" rel="stylesheet" crossorigin="anonymous">
+</head>
+<body>
+<header>
+    <nav th:replace="template :: navbar"/>
+    <vav th:replace="external/template :: external"/>
+</header>
+<main>
+    <div class="container">
+        <div class="table-responsive">
+            <table class="table table-sm display dataTable no-footer" style="font-size: small">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col" class="sorting" th:classappend="(${sortBy}=='Username') ? 'sorting_'+${order}" >
+                            <a class="link-dark" th:href="@{/external/fetches/((sortBy='Username'), (order=(${order}=='asc') ? 'desc' : 'asc'))}" style="display:block; text-decoration: none;" href="#">User</a>
+                        </th>
+                        <th scope="col" class="sorting" th:classappend="(${sortBy}=='Host') ? 'sorting_'+${order}" >
+                            <a class="link-dark" th:href="@{/external/fetches/((sortBy='Host'), (order=(${order}=='asc') ? 'desc' : 'asc'))}" style="display:block; text-decoration: none;" href="#">Host</a>
+                        </th>
+                        <th scope="col" class="sorting" th:classappend="(${sortBy}=='DateTime') ? 'sorting_'+${order}">
+                            <a class="link-dark" th:href="@{/external/fetches/((sortBy='DateTime'), (order=(${order}=='asc') ? 'desc' : 'asc'))}" style="display:block; text-decoration: none;" href="#">Date Time</a>
+                        </th>
+                        <th scope="col" class="sorting" th:classappend="(${sortBy}=='Aim') ? 'sorting_'+${order}">
+                            <a class="link-dark" th:href="@{/external/fetches/((sortBy='Aim'), (order=(${order}=='asc') ? 'desc' : 'asc'))}" style="display:block; text-decoration: none;" href="#">Aim</a>
+                        </th>
+                        <th scope="col" class="sorting" th:classappend="(${sortBy}=='Invocs') ? 'sorting_'+${order}">
+                            <a class="link-dark" th:href="@{/external/fetches/((sortBy='Invocs'), (order=(${order}=='asc') ? 'desc' : 'asc'))}" style="display:block; text-decoration: none;" href="#">Invocs</a>
+                        </th>
+                        <th scope="col" class="sorting" th:classappend="(${sortBy}=='Fetched') ? 'sorting_'+${order}">
+                            <a class="link-dark" th:href="@{/external/fetches/((sortBy='Fetched'), (order=(${order}=='asc') ? 'desc' : 'asc'))}" style="display:block; text-decoration: none;" href="#">Fetched</a>
+                        </th>
+                        <th scope="col" class="sorting" th:classappend="(${sortBy}=='Status') ? 'sorting_'+${order}">
+                            <a class="link-dark" th:href="@{/external/fetches/((sortBy='Status'), (order=(${order}=='asc') ? 'desc' : 'asc'))}" style="display:block; text-decoration: none;" href="#">Status</a>
+                        </th>
+                        <th scope="col" class="sorting" th:classappend="(${sortBy}=='Error') ? 'sorting_'+${order}">
+                            <a class="link-dark" th:href="@{/external/fetches/((sortBy='Error'), (order=(${order}=='asc') ? 'desc' : 'asc'))}" style="display:block; text-decoration: none;" href="#">Error</a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="fetch : ${allFetches}">
+                        <td th:text="${fetch.username}">Username</td>
+                        <td th:text="${fetch.tubeHost}">xHamster</td>
+                        <td th:text="${fetch.fetchDateTime}">2020-01-01 15:35</td>
+                        <td th:text="${fetch.aim}">NEW</td>
+                        <td><a class="btn btn-link btn-sm" th:onclick="'javascript:openFetchInvocationsModal(\''+ ${fetch.id} + '\');'" th:text="${fetch.invocationsNumber}">5</a></td>
+                        <td th:text="${fetch.fetchedGalleriesNumber}">100</td>
+                        <td th:text="${fetch.status}">OK</td>
+                        <td class="col-md-1">
+                            <div style="font-size: xx-small; word-wrap: break-word;" th:text="${fetch.errorMessage}">none</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center" th:if="${sortBy == null}">
+                <li class="page-item" th:classappend="(${currentPage}==${firstPage}) ? disabled "><a class="page-link" th:href="@{/external/fetches/(page=${firstPage})}">First</a></li>
+                <li class="page-item" th:classappend="(${currentPage}==${previousPage}) ? disabled "><a class="page-link" th:href="@{/external/fetches/(page=${previousPage})}" tabindex="-1">Previous</a></li>
+                <li th:each="page : ${pages}" class="page-item" th:classappend="(${page}==${currentPage}) ? disabled "><a class="page-link" th:href="@{/external/fetches/(page=${page})}" th:text="${page}">1</a></li>
+                <li class="page-item" th:classappend="(${currentPage}==${nextPage}) ? disabled "><a class="page-link" th:href="@{/external/fetches/(page=${nextPage})}">Next</a></li>
+                <li class="page-item" th:classappend="(${currentPage}==${lastPage}) ? disabled "><a class="page-link" th:href="@{/external/fetches/(page=${lastPage})}">Last</a></li>
+            </ul>
+            <ul class="pagination justify-content-center" th:if="${sortBy != null}">
+                <li class="page-item" th:classappend="(${currentPage}==${firstPage}) ? disabled "><a class="page-link" th:href="@{/external/fetches/((order=(${order}=='desc') ? 'desc' : 'asc'), (page=${firstPage}))}">First</a></li>
+                <li class="page-item" th:classappend="(${currentPage}==${previousPage}) ? disabled "><a class="page-link" th:href="@{/external/fetches/((sortBy=${sortBy}), (order=(${order}=='desc') ? 'desc' : 'asc'), (page=${previousPage}))}" tabindex="-1">Previous</a></li>
+                <li th:each="page : ${pages}" class="page-item" th:classappend="(${page}==${currentPage}) ? disabled "><a class="page-link" th:href="@{/external/fetches/((sortBy=${sortBy}), (order=(${order}=='desc') ? 'desc' : 'asc'), (page=${page}))}" th:text="${page}">1</a></li>
+                <li class="page-item" th:classappend="(${currentPage}==${nextPage}) ? disabled "><a class="page-link" th:href="@{/external/fetches/((sortBy=${sortBy}), (order=(${order}=='desc') ? 'desc' : 'asc'), (page=${nextPage}))}">Next</a></li>
+                <li class="page-item" th:classappend="(${currentPage}==${lastPage}) ? disabled "><a class="page-link" th:href="@{/external/fetches/((sortBy=${sortBy}), (order=(${order}=='desc') ? 'desc' : 'asc'), (page=${lastPage}))}">Last</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div th:fragment="fetch-invocations" id="fetchInvocationsModalHolder"></div>
+</main>
+<footer th:replace="template :: footer"/>
+<script th:src="@{/js/bootstrap.min.js}" src="../../../static/js/bootstrap.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script th:src="@{/js/jquery.min.js}" src="../../../static/js/jquery.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script th:src="@{/js/jquery.dataTables.min.js}" src="../../../static/js/jquery.dataTables.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script th:src="@{/js/dataTables.bootstrap5.min.js}" src="../../../static/js/dataTables.bootstrap5.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript">
+    function openFetchInvocationsModal(id){
+        $.ajax({
+            url: "/external/fetches/invocations?fetchId=" + id,
+            success: function(data){
+                $("#fetchInvocationsModalHolder").html(data);
+                var config = {
+                    backdrop: 'static',
+                    keyboard: true
+                };
+                var fetchInvocationsModal = new bootstrap.Modal(document.getElementById('fetchInvocationsModal'), config);
+                fetchInvocationsModal.toggle();
+            }
+        });
+    }
+</script>
+</body>
+</html>

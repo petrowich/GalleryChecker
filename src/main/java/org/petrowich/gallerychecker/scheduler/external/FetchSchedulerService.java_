@@ -1,0 +1,192 @@
+package org.petrowich.gallerychecker.scheduler.external;
+
+import lombok.extern.slf4j.Slf4j;
+import org.petrowich.gallerychecker.models.master.tubes.Tube;
+
+import org.petrowich.gallerychecker.models.fetches.enums.FetchAim;
+import org.petrowich.gallerychecker.scheduler.external.exceptions.FetchJobException;
+import org.petrowich.gallerychecker.processig.external.TubeGalleriesFetchJob;
+import org.quartz.*;
+import org.quartz.impl.matchers.GroupMatcher;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyList;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+
+@Slf4j
+@Component
+public class FetchSchedulerService {
+    private static final String JOB_GROUP = "fetching-galleries-jobs";
+    private static final String TRIGGER_GROUP = "fetching-galleries-triggers";
+    private static final String FETCH_AIM = "fetchAim";
+    private static final String USERNAME = "username";
+    private static final String TUBE_HOST = "tubeHost";
+    private static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm";
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_FORMAT);
+    private static final ZoneId zoneId = ZoneId.systemDefault();
+    private final Scheduler scheduler;
+
+    @Autowired
+    public FetchSchedulerService(Scheduler scheduler) {
+        this.scheduler = scheduler;
+    }
+
+    public List<SimpleTrigger> getAllTriggers() {
+        log.debug("Getting all triggers");
+        GroupMatcher<TriggerKey> groupMatcher = GroupMatcher.groupEquals(TRIGGER_GROUP);
+        try {
+            return scheduler.getTriggerKeys(groupMatcher).stream()
+                    .map(this::getTrigger)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+        } catch (SchedulerException exception) {
+            log.error(exception.getMessage(), exception);
+            return emptyList();
+        }
+    }
+
+    public SimpleTrigger getTriggerById(String triggerId) {
+        log.debug("Getting trigger by triggerId={}", triggerId);
+        TriggerKey triggerKey = new TriggerKey(triggerId, TRIGGER_GROUP);
+        return getTrigger(triggerKey);
+    }
+
+    private SimpleTrigger getTrigger(TriggerKey triggerKey) {
+        log.debug("Getting trigger by triggerKey={}", triggerKey);
+        try {
+            return (SimpleTrigger) scheduler.getTrigger(triggerKey);
+        } catch (SchedulerException exception) {
+            log.error(exception.getMessage(), exception);
+            return null;
+        }
+    }
+
+    public String getTriggerStateName(Trigger trigger) {
+        log.debug("Getting trigger state name {}", trigger);
+        try {
+            return scheduler.getTriggerState(trigger.getKey()).name();
+        } catch (SchedulerException exception) {
+            log.error(exception.getMessage(), exception);
+            return "not defined";
+        }
+    }
+
+    public void cancelTrigger(SimpleTrigger trigger) {
+        log.debug("Canceling trigger {}", trigger);
+        try {
+            scheduler.unscheduleJob(trigger.getKey());
+        } catch (SchedulerException exception) {
+            log.error(exception.getMessage(), exception);
+        }
+    }
+
+    public void interruptJob(JobKey jobKey) {
+        log.debug("Interrupting job {}", jobKey);
+        try {
+            scheduler.interrupt(jobKey);
+        } catch (SchedulerException exception) {
+            log.error(exception.getMessage(), exception);
+        }
+    }
+
+    public void scheduleJobAtOnce(TubeGalleriesFetchJob tubeGalleriesFetchJob,
+                                  FetchAim fetchAim,
+                                  String username) throws FetchJobException {
+        log.info("Scheduling job {} from {} at once.", fetchAim, tubeGalleriesFetchJob.getTube());
+        JobDetail jobDetail = buildJobDetail(tubeGalleriesFetchJob, fetchAim, username);
+        SimpleTrigger trigger = buildTriggerForAtOnce(jobDetail);
+        Tube tube = tubeGalleriesFetchJob.getTube();
+        scheduleJob(jobDetail, trigger, tube);
+        log.info("Job {} from {} at once scheduled successfully!", fetchAim, tubeGalleriesFetchJob.getTube());
+    }
+
+    public void scheduleJobAtTimeWitPeriodInHours(TubeGalleriesFetchJob tubeGalleriesFetchJob,
+                                                  FetchAim fetchAim,
+                                                  LocalDateTime startAt,
+                                                  Integer periodHours,
+                                                  String username) throws FetchJobException {
+        log.info("Scheduling job {} from {} at {} with interval in {} hours.",
+                fetchAim, tubeGalleriesFetchJob.getTube(), startAt.format(dateTimeFormatter), periodHours);
+        JobDetail jobDetail = buildJobDetail(tubeGalleriesFetchJob, fetchAim, username);
+        Trigger trigger = buildTriggerWithIntervalInHours(jobDetail, startAt, periodHours);
+        Tube tube = tubeGalleriesFetchJob.getTube();
+        scheduleJob(jobDetail, trigger, tube);
+        log.info("Job {} from {} at {} with interval in {} hours scheduled successfully!",
+                fetchAim, tubeGalleriesFetchJob.getTube(), startAt.format(dateTimeFormatter), periodHours);
+    }
+
+    private JobDetail buildJobDetail(TubeGalleriesFetchJob tubeGalleriesFetchJob, FetchAim fetchAim, String username) {
+        final Class jobClass = tubeGalleriesFetchJob.getClass();
+
+        String jobId = generateId();
+        Tube tube = tubeGalleriesFetchJob.getTube();
+
+        JobDetail jobDetail = JobBuilder.newJob(jobClass)
+                .withIdentity(jobId, JOB_GROUP)
+                .usingJobData(TUBE_HOST, tube.getHost())
+                .withDescription(String.format("Fetching galleries from %s", tube))
+                .storeDurably()
+                .build();
+
+        jobDetail.getJobDataMap().put(FETCH_AIM, fetchAim);
+        jobDetail.getJobDataMap().put(USERNAME, username);
+
+        return jobDetail;
+    }
+
+    private SimpleTrigger buildTriggerForAtOnce(JobDetail jobDetail) {
+        SimpleScheduleBuilder simpleScheduleBuilder = SimpleScheduleBuilder.simpleSchedule()
+                .withMisfireHandlingInstructionFireNow();
+
+        String triggerId = generateId();
+
+        return TriggerBuilder.newTrigger()
+                .forJob(jobDetail)
+                .usingJobData(jobDetail.getJobDataMap())
+                .withIdentity(triggerId, TRIGGER_GROUP)
+                .withDescription("Fetching galleries at once")
+                .startNow()
+                .withSchedule(simpleScheduleBuilder)
+                .build();
+    }
+
+    private SimpleTrigger buildTriggerWithIntervalInHours(JobDetail jobDetail,
+                                                          LocalDateTime startAt,
+                                                          Integer intervalInHours) {
+        SimpleScheduleBuilder simpleScheduleBuilder = simpleSchedule()
+                .withIntervalInHours(intervalInHours)
+                .repeatForever();
+
+        String triggerId = generateId();
+
+        return TriggerBuilder.newTrigger()
+                .forJob(jobDetail)
+                .usingJobData(jobDetail.getJobDataMap())
+                .withIdentity(triggerId, TRIGGER_GROUP)
+                .withDescription(String.format("Fetching galleries at %s", startAt.format(dateTimeFormatter)))
+                .startAt(Date.from(startAt.atZone(zoneId).toInstant()))
+                .withSchedule(simpleScheduleBuilder)
+                .build();
+    }
+
+    private String generateId() {
+        return UUID.randomUUID().toString();
+    }
+
+    private void scheduleJob(JobDetail jobDetail, Trigger trigger, Tube tube)
+            throws FetchJobException {
+        try {
+            scheduler.scheduleJob(jobDetail, trigger);
+        } catch (SchedulerException exception) {
+            log.error(exception.getMessage(), exception);
+            throw new FetchJobException(exception.getMessage(), tube, exception);
+        }
+    }
+}

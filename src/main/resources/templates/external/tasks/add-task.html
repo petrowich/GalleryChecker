@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+<html lang="en" xml:lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="../../../static/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <script src="../../../static/js/bootstrap.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../../../static/js/flatpickr.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../../../static/js/jquery.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+<header>
+</header>
+<main>
+<div th:fragment="add-task" id="addTaskModal" class="modal fade" role="dialog" aria-labelledby="addTaskLabel" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="taskModalLabel">Create new task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="#" th:action="@{/external/tasks/add}" th:object="${task}" method="post">
+                <div class="modal-body">
+                    <div class="mb-3 row">
+                        <label for="tube" class="col-sm-2 col-form-label">Tube</label>
+                        <div class="col-sm-10">
+                            <select th:field="*{tubeId}" class="form-select" id="tube"
+                                    aria-label=".form-select-sm">
+                                <option value="1" th:each="tube : ${allTubes}" th:value="${tube.id}"
+                                        th:text="${tube.host}">xHamster
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="aim" class="col-sm-2 col-form-label">Fetch</label>
+                        <div class="col-sm-10" id="aim">
+                            <div class="form-check">
+                                <label class="form-check-label" for="aimNew">new</label>
+                                <input class="form-check-input" type="radio" name="aimRadios" id="aimNew"
+                                       value="NEW" th:field="${task.aim}" checked>
+                            </div>
+                            <div class="form-check">
+                                <label class="form-check-label" for="aimDeleted">deleted</label>
+                                <input class="form-check-input" type="radio" name="aimRadios" id="aimDeleted"
+                                       value="DELETED" th:field="${task.aim}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="datetimepicker_next" class="col-sm-2 col-form-label">Launch</label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <input th:field="*{next}" class="form-control form-control-solid" type="datetime-local" id="datetimepicker_next" placeholder="Select date and time...">
+                                <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="period" class="col-sm-2 col-form-label">Period</label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <input th:field="*{periodHours}" class="form-control" type="number" id="period" placeholder="hours" value="24" min="1">
+                                <span class="input-group-text"><i class="bi bi-clock-history"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript">
+        document.getElementById("aimNew").setAttribute("checked","checked")
+
+        flatpickr('#datetimepicker_next', {
+                enableTime: true,
+                dateFormat: 'Y-m-d H:i',
+                altInput: true,
+                altFormat: 'F j, Y H:i'
+                });
+    </script>
+</div>
+</main>
+<script type="text/javascript">$(window).on('load',function(){$('#addTaskModal').modal('show');});</script>
+</body>
+</html>

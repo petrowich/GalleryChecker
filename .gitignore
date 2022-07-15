@@ -1,0 +1,9 @@
+/out/
+
+/lib/
+
+/.idea/
+
+*-help.sql
+*-help.text
+*-dev.properties

@@ -1,0 +1,94 @@
+<!DOCTYPE HTML>
+<html lang="en" xml:lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Gallery Checker: Checks</title>
+    <link th:href="@{/css/bootstrap.min.css}" href="../../../static/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link th:href="@{/css/dataTables.bootstrap5.min.css}" href="../../../static/css/dataTables.bootstrap5.min.css" rel="stylesheet" crossorigin="anonymous">
+</head>
+<body>
+<header>
+    <nav th:replace="template :: navbar"/>
+    <vav th:replace="stored/template :: stored"/>
+</header>
+<main>
+    <div class="container">
+        <div class="table-responsive">
+            <table class="table table-sm display dataTable no-footer" style="width: 100%; font-size: small">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col" class="sorting" th:classappend="(${sortBy}=='Username') ? 'sorting_'+${order}" >
+                            <a class="link-dark" th:href="@{/stored/checks((sortBy='Username'), (order=(${order}=='asc') ? 'desc' : 'asc'))}" style="display:block; text-decoration: none;" href="#">User</a>
+                        </th>
+                        <th scope="col" class="sorting" th:classappend="(${sortBy}=='Site') ? 'sorting_'+${order}" >
+                            <a class="link-dark" th:href="@{/stored/checks((sortBy='Site'), (order=(${order}=='asc') ? 'desc' : 'asc'))}" style="display:block; text-decoration: none;" href="#">Site</a>
+                        </th>
+                        <th scope="col" class="sorting" th:classappend="(${sortBy}=='DateTime') ? 'sorting_'+${order}">
+                            <a class="link-dark" th:href="@{/stored/checks((sortBy='DateTime'), (order=(${order}=='asc') ? 'desc' : 'asc'))}" style="display:block; text-decoration: none;" href="#">Date Time</a>
+                        </th>
+                        <th scope="col" class="sorting" th:classappend="(${sortBy}=='Checked') ? 'sorting_'+${order}">
+                            <a class="link-dark" th:href="@{/stored/checks((sortBy='Checked'), (order=(${order}=='asc') ? 'desc' : 'asc'))}" style="display:block; text-decoration: none;" href="#">Checked</a>
+                        </th>
+                        <th scope="col" class="sorting" th:classappend="(${sortBy}=='Status') ? 'sorting_'+${order}">
+                            <a class="link-dark" th:href="@{/stored/checks((sortBy='Status'), (order=(${order}=='asc') ? 'desc' : 'asc'))}" style="display:block; text-decoration: none;" href="#">Status</a>
+                        </th>
+                        <th scope="col" class="sorting" th:classappend="(${sortBy}=='Error') ? 'sorting_'+${order}">
+                            <a class="link-dark" th:href="@{/stored/checks((sortBy='Error'), (order=(${order}=='asc') ? 'desc' : 'asc'))}" style="display:block; text-decoration: none;" href="#">Error</a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody th:unless="${#lists.isEmpty(allChecks)}">
+                    <tr th:each="check : ${allChecks}">
+                        <td class="col-md-1"th:text="${check.username}">username</td>
+                        <td class="col-md-1"th:text="${check.siteHost}">xxx.xx</td>
+                        <td class="col-md-2"th:text="${check.checkDateTime}">2020-01-01 15:35</td>
+                        <td class="col-md-1"><a class="btn btn-link btn-sm" th:onclick="'javascript:openCheckedGalleriesModal(\''+ ${check.id} + '\');'" th:text="${check.checkedGalleriesNumber}">10</a></td>
+                        <td class="col-md-1"th:text="${check.status}">OK</td>
+                        <td class="col-md-1">
+                            <div style="font-size: xx-small; word-wrap: break-word;" th:text="${check.errorMessage}">error</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center" th:if="${sortBy == null}">
+                <li class="page-item" th:classappend="(${currentPage}==${firstPage}) ? disabled "><a class="page-link" th:href="@{/stored/checks(page=${firstPage})}">First</a></li>
+                <li class="page-item" th:classappend="(${currentPage}==${previousPage}) ? disabled "><a class="page-link" th:href="@{/stored/checks(page=${previousPage})}" tabindex="-1">Previous</a></li>
+                <li th:each="page : ${pages}" class="page-item" th:classappend="(${page}==${currentPage}) ? disabled "><a class="page-link" th:href="@{/stored/checks(page=${page})}" th:text="${page}">1</a></li>
+                <li class="page-item" th:classappend="(${currentPage}==${nextPage}) ? disabled "><a class="page-link" th:href="@{/stored/checks(page=${nextPage})}">Next</a></li>
+                <li class="page-item" th:classappend="(${currentPage}==${lastPage}) ? disabled "><a class="page-link" th:href="@{/stored/checks(page=${lastPage})}">Last</a></li>
+            </ul>
+            <ul class="pagination justify-content-center" th:if="${sortBy != null}">
+                <li class="page-item" th:classappend="(${currentPage}==${firstPage}) ? disabled "><a class="page-link" th:href="@{/stored/checks((order=(${order}=='desc') ? 'desc' : 'asc'), (page=${firstPage}))}">First</a></li>
+                <li class="page-item" th:classappend="(${currentPage}==${previousPage}) ? disabled "><a class="page-link" th:href="@{/stored/checks((sortBy=${sortBy}), (order=(${order}=='desc') ? 'desc' : 'asc'), (page=${previousPage}))}" tabindex="-1">Previous</a></li>
+                <li th:each="page : ${pages}" class="page-item" th:classappend="(${page}==${currentPage}) ? disabled "><a class="page-link" th:href="@{/stored/checks((sortBy=${sortBy}), (order=(${order}=='desc') ? 'desc' : 'asc'), (page=${page}))}" th:text="${page}">1</a></li>
+                <li class="page-item" th:classappend="(${currentPage}==${nextPage}) ? disabled "><a class="page-link" th:href="@{/stored/checks((sortBy=${sortBy}), (order=(${order}=='desc') ? 'desc' : 'asc'), (page=${nextPage}))}">Next</a></li>
+                <li class="page-item" th:classappend="(${currentPage}==${lastPage}) ? disabled "><a class="page-link" th:href="@{/stored/checks((sortBy=${sortBy}), (order=(${order}=='desc') ? 'desc' : 'asc'), (page=${lastPage}))}">Last</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div th:fragment="check-invocations" id="checkInvocationsModalHolder"></div>
+</main>
+<footer th:replace="template :: footer"/>
+<script th:src="@{/js/bootstrap.min.js}" src="/static/js/bootstrap.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script th:src="@{/js/jquery.min.js}" src="/static/js/jquery.min.js" type="text/javascript" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript">
+    function openCheckedGalleriesModal(id){
+        $.ajax({
+            url: "/stored/checks/checked?checkId=" + id,
+            success: function(data){
+                $("#checkedGalleriesModalHolder").html(data);
+                var config = {
+                    backdrop: 'static',
+                    keyboard: true
+                };
+                var checkedGalleriesModal = new bootstrap.Modal(document.getElementById('checkedGalleriesModal'), config);
+                checkedGalleriesModal.toggle();
+            }
+        });
+    }
+</script>
+</body>
+</html>
